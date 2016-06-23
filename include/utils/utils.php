@@ -2296,4 +2296,25 @@ function getCompanyDetails() {
 function lower_array(&$string){
 		$string = strtolower(trim($string));
 }
+
+function getEmailContents($template,$entities) {
+	
+	$adb = PearDatabase::getInstance();	
+	//here id is hardcoded with 5. it is for support start notification in vtiger_notificationscheduler
+	$query="SELECT vtiger_emailtemplates.subject,vtiger_emailtemplates.body
+				FROM vtiger_emailtemplates
+				WHERE templatename='".$template."'";
+
+	$result = $adb->pquery($query, array());
+	$body=$adb->query_result($result,0,'body');
+	$contents=$body;
+	
+	foreach($entities as $entity)
+		$body=getMergedDescription($body,$entity['id'],$entity['setype']);
+	
+	$value["subject"]=html_entity_decode($adb->query_result($result,0,'subject'));
+	$value["body"]=html_entity_decode($body);
+	
+	return $value;
+}
 ?>
